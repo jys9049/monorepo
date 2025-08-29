@@ -62,10 +62,25 @@ steps:
           fi
 
           if [ -f "$$APP_DIR/Dockerfile" ]; then
-            echo "Found Dockerfile for $$app — building image via gcloud builds submit using repo root as context"
-            # Submit the repo root as the build context but point to the app's Dockerfile
-            # so pnpm can resolve workspace packages (packages/, pnpm-workspace.yaml).
-            gcloud builds submit . --tag "$$IMAGE" --dockerfile "$$APP_DIR/Dockerfile"
+            echo "Found Dockerfile for $$app — preparing temporary build context including workspace packages"
+            TMPCTX="/workspace/build_context_$$app"
+            rm -rf "$$TMPCTX" || true
+            mkdir -p "$$TMPCTX"
+
+            # copy workspace-level files so pnpm can resolve workspace packages
+            [ -f pnpm-lock.yaml ] && cp pnpm-lock.yaml "$$TMPCTX/" || true
+            [ -f pnpm-workspace.yaml ] && cp pnpm-workspace.yaml "$$TMPCTX/" || true
+            [ -f package.json ] && cp package.json "$$TMPCTX/" || true
+            if [ -d packages ]; then
+              cp -a packages "$$TMPCTX/" || true
+            fi
+
+            # copy the app contents into the root of the temp context so Dockerfile is at ./Dockerfile
+            cp -a "$$APP_DIR/." "$$TMPCTX/" || true
+
+            echo "Submitting build context $$TMPCTX to Cloud Build"
+            gcloud builds submit "$$TMPCTX" --tag "$$IMAGE"
+            rm -rf "$$TMPCTX" || true
           else
             echo "No Dockerfile for $$app — trying buildpacks (gcloud builds submit --pack)"
             gcloud builds submit --pack "$$APP_DIR" --tag "$$IMAGE"

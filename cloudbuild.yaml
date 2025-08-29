@@ -18,14 +18,14 @@ steps:
 
         CHANGED_APPS=$(git fetch origin main && git diff --name-only origin/main...HEAD | grep '^apps/landing-' | cut -d/ -f2 | sort -u)
 
-        if [ -z "$CHANGED_APPS" ]; then
+        if [ -z "$$CHANGED_APPS" ]; then
           echo "No landing apps changed. Skipping build."
           exit 0
         fi
 
-        echo "Changed apps: $CHANGED_APPS"
+        echo "Changed apps: $$CHANGED_APPS"
 
-        for APP in $CHANGED_APPS; do
+        for APP in $$CHANGED_APPS; do
           echo "Building $APP..."
           pnpm install --filter=$APP...
           pnpm --filter=$APP run build

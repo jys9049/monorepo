@@ -1,28 +1,13 @@
 steps:
-  - name: "node:20-alpine"
-    id: "Setup Node & PNPM"
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk:latest"
     entrypoint: "sh"
     args:
       - "-c"
       - |
         npm install -g pnpm
-        pnpm install --frozen-lockfile
-
-  - name: "node:20-alpine"
-    id: "Build Landing App"
-    entrypoint: "sh"
-    args:
-      - "-c"
-      - |
-        if [ -z "${_REPO_NAME}" ]; then
-          echo "No landing app specified. Skipping build."
-          exit 0
-        fi
-
-        echo "Building ${_REPO_NAME}..."
-        pnpm install --filter=${_REPO_NAME}...
-        pnpm --filter=${_REPO_NAME} run build
-        pnpm --filter=${_REPO_NAME} next export
+        pnpm install --filter=apps/${_REPO_NAME}...
+        pnpm --filter=apps/${_REPO_NAME} run build
+        pnpm --filter=apps/${_REPO_NAME} next export
         gsutil -m rsync -r apps/${_REPO_NAME}/out gs://${_GCS_BUCKET}/${_REPO_NAME}/
         gcloud compute url-maps invalidate-cdn-cache ${_CDN_URLMAP} --path "/${_REPO_NAME}/*"
 

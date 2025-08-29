@@ -7,6 +7,7 @@ export default function Home() {
   console.log(process.env.NEXT_PUBLIC_API_URL);
   return (
     <div className={styles.container}>
+      테스트
       <Image
         src="https://cdn.driven.run/landing/cellis/2/01.gif"
         alt="cellis-image-1"
@@ -136,7 +137,6 @@ export default function Home() {
           alt=""
         />
       </div>
-
       <div id="myModal" className={styles.modal}>
         <div className={styles.modal_content}>
           <span

@@ -62,8 +62,10 @@ steps:
           fi
 
           if [ -f "$$APP_DIR/Dockerfile" ]; then
-            echo "Found Dockerfile for $$app — building image via gcloud builds submit"
-            gcloud builds submit "$$APP_DIR" --tag "$$IMAGE"
+            echo "Found Dockerfile for $$app — building image via gcloud builds submit using repo root as context"
+            # Submit the repo root as the build context but point to the app's Dockerfile
+            # so pnpm can resolve workspace packages (packages/, pnpm-workspace.yaml).
+            gcloud builds submit . --tag "$$IMAGE" --dockerfile "$$APP_DIR/Dockerfile"
           else
             echo "No Dockerfile for $$app — trying buildpacks (gcloud builds submit --pack)"
             gcloud builds submit --pack "$$APP_DIR" --tag "$$IMAGE"

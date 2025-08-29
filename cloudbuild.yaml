@@ -10,11 +10,11 @@ steps:
 
   - name: "node:20-alpine"
     id: "Build Changed Landing Apps"
-    entrypoint: "bash"
+    entrypoint: "sh"
     args:
       - "-c"
       - |
-        apk add --no-cache git bash
+        apk add --no-cache git
 
         CHANGED_APPS=$(git fetch origin main && git diff --name-only origin/main...HEAD | grep '^apps/landing-' | cut -d/ -f2 | sort -u)
 

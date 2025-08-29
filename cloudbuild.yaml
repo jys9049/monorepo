@@ -54,6 +54,13 @@ steps:
           APP_DIR="apps/$$app"
           IMAGE="gcr.io/$PROJECT_ID/$$app"
 
+          # If a repo-level pnpm-lock.yaml exists and the app doesn't have one,
+          # copy it into the app directory so the Docker build can find it.
+          if [ -f pnpm-lock.yaml ] && [ ! -f "$$APP_DIR/pnpm-lock.yaml" ]; then
+            echo "Copying root pnpm-lock.yaml into $$APP_DIR/"
+            cp pnpm-lock.yaml "$$APP_DIR/" || true
+          fi
+
           if [ -f "$$APP_DIR/Dockerfile" ]; then
             echo "Found Dockerfile for $$app — building image via gcloud builds submit"
             gcloud builds submit "$$APP_DIR" --tag "$$IMAGE"

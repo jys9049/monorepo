@@ -1,27 +1,21 @@
 # cloudbuild.yaml
 steps:
   - name: "node:20-alpine"
-    id: "Setup Node & PNPM"
-    entrypoint: "sh"
-    args:
-      - "-c"
-      - |
-        npm install -g pnpm
-        pnpm install --frozen-lockfile
-
-  - name: "node:20-alpine"
-    id: "Build Changed Landing Apps"
     entrypoint: "bash"
     args:
       - "-c"
       - |
-        CHANGED_APPS=$(git diff --name-only origin/main...HEAD | grep '^apps/landing-' | cut -d/ -f2 | sort -u)
+        apk add --no-cache git
+
+        # 수정된 landing 앱 감지
+        CHANGED_APPS=$(git fetch origin main && git diff --name-only origin/main...HEAD | grep '^apps/landing-' | cut -d/ -f2 | sort -u)
+
         if [ -z "$CHANGED_APPS" ]; then
           echo "No landing apps changed. Skipping build."
           exit 0
         fi
 
-        echo "CHANGED_APPS: $CHANGED_APPS"
+        echo "Changed apps: $CHANGED_APPS"
 
         for APP in $CHANGED_APPS; do
           echo "Building $APP..."

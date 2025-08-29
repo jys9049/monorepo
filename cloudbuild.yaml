@@ -9,35 +9,28 @@ steps:
         pnpm install --frozen-lockfile
 
   - name: "node:20-alpine"
-    id: "Build Changed Landing Apps"
+    id: "Build Landing App"
     entrypoint: "sh"
     args:
       - "-c"
       - |
-        apk add --no-cache git
-
-        CHANGED_APPS=$(git diff --name-only origin/main..HEAD | grep '^apps/' | awk -F/ '{print $2}' | sort -u)
-
-        if [ -z "$$CHANGED_APPS" ]; then
-          echo "No landing apps changed. Skipping build."
+        if [ -z "${_REPO_NAME}" ]; then
+          echo "No landing app specified. Skipping build."
           exit 0
         fi
 
-        echo "Changed apps: $$CHANGED_APPS"
+        echo "Building ${_REPO_NAME}..."
+        pnpm install --filter=${_REPO_NAME}...
+        pnpm --filter=${_REPO_NAME} run build
+        pnpm --filter=${_REPO_NAME} next export
+        gsutil -m rsync -r apps/${_REPO_NAME}/out gs://${_GCS_BUCKET}/${_REPO_NAME}/
+        gcloud compute url-maps invalidate-cdn-cache ${_CDN_URLMAP} --path "/${_REPO_NAME}/*"
 
-        for APP in $$CHANGED_APPS; do
-          echo "Building $$APP..."
-          pnpm install --filter=$$APP...
-          pnpm --filter=$$APP run build
-          pnpm --filter=$$APP next export
-          gsutil -m rsync -r apps/$$APP/out gs://${_GCS_BUCKET}/$$APP/
-          gcloud compute url-maps invalidate-cdn-cache ${_CDN_URLMAP} --path "/$$APP/*"
-        done
 options:
   logging: CLOUD_LOGGING_ONLY
 
 substitutions:
   _GCS_BUCKET: "landing-jys"
   _CDN_URLMAP: "landing-jys"
-
+  _REPO_NAME: "" # 트리거에서 이 변수로 앱 이름 넘겨줌
 timeout: 1800s

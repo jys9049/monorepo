@@ -16,7 +16,8 @@ steps:
       - |
         apk add --no-cache git
 
-        CHANGED_APPS=$(git fetch origin main && git diff --name-only origin/main...HEAD | grep '^apps/landing-' | cut -d/ -f2 | sort -u)
+        git fetch --unshallow origin main
+        CHANGED_APPS=$(git diff --name-only origin/main...HEAD | grep '^apps/landing-' | cut -d/ -f2 | sort -u)
 
         if [ -z "$$CHANGED_APPS" ]; then
           echo "No landing apps changed. Skipping build."

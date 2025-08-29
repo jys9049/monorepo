@@ -2,97 +2,33 @@
 
 import Image from "next/image";
 import styles from "./page.module.css";
+import { Images, type ImageItemProps } from "@driven/ui";
 
 export default function Home() {
-  console.log(process.env.NEXT_PUBLIC_API_URL);
+  const images1: ImageItemProps[] = [
+    {
+      path: "/cellis/2/01.gif",
+    },
+    {
+      path: "/cellis/2/02.jpg",
+    },
+    {
+      path: "/cellis/2/03.jpg",
+    },
+    {
+      path: "/cellis/2/04.jpg",
+    },
+    {
+      path: "/cellis/2/05.jpg",
+    },
+    {
+      path: "/cellis/2/06.jpg",
+    },
+  ];
   return (
     <div className={styles.container}>
-      테스트
-      <Image
-        src="https://cdn.driven.run/landing/cellis/2/01.gif"
-        alt="cellis-image-1"
-        width={1000}
-        height={1000}
-        className={styles.image}
-      />
-      <Image
-        src="https://cdn.driven.run/landing/cellis/2/02.jpg"
-        alt="cellis-image-2"
-        width={1000}
-        height={1000}
-        className={styles.image}
-      />
-      <Image
-        src="https://cdn.driven.run/landing/cellis/2/03.jpg"
-        alt="cellis-image-3"
-        width={1000}
-        height={1000}
-        className={styles.image}
-      />
-      <Image
-        src="https://cdn.driven.run/landing/cellis/2/04.jpg"
-        alt="cellis-image-4"
-        width={1000}
-        height={1000}
-        className={styles.image}
-      />
-      <Image
-        src="https://cdn.driven.run/landing/cellis/2/05.jpg"
-        alt="cellis-image-5"
-        width={1000}
-        height={1000}
-        className={styles.image}
-      />
-      <Image
-        src="https://cdn.driven.run/landing/cellis/2/06.jpg"
-        alt="cellis-image-6"
-        width={1000}
-        height={1000}
-        className={styles.image}
-      />
-      <Image
-        src="https://cdn.driven.run/landing/cellis/2/07.jpg"
-        alt="cellis-image-7"
-        width={1000}
-        height={1000}
-        className={styles.image}
-      />
-      <Image
-        src="https://cdn.driven.run/landing/cellis/2/08.jpg"
-        alt="cellis-image-8"
-        width={1000}
-        height={1000}
-        className={styles.image}
-      />
-      <Image
-        src="https://cdn.driven.run/landing/cellis/2/09.jpg"
-        alt="cellis-image-9"
-        width={1000}
-        height={1000}
-        className={styles.image}
-      />
-      <Image
-        src="https://cdn.driven.run/landing/cellis/2/10.jpg"
-        alt="cellis-image-10"
-        width={1000}
-        height={1000}
-        className={styles.image}
-      />
-      <Image
-        src="https://cdn.driven.run/landing/cellis/2/11.jpg"
-        alt="cellis-image-11"
-        width={1000}
-        height={1000}
-        className={styles.image}
-      />
-      <Image
-        src="https://cdn.driven.run/landing/cellis/2/12.jpg"
-        alt="cellis-image-12"
-        width={1000}
-        height={1000}
-        className={styles.image}
-      />
-      <div className={styles.form_section} id="form_section">
+      <Images images={images1} className={styles.image} />
+      {/* <div className={styles.form_section} id="form_section">
         <form name="form" id="form">
           <div className={styles.inputForm_wrapper}>
             <div>
@@ -136,7 +72,7 @@ export default function Home() {
           src="https://cdn.driven.run/landing/cellis/2/submitBtn.gif"
           alt=""
         />
-      </div>
+      </div> */}
       <div id="myModal" className={styles.modal}>
         <div className={styles.modal_content}>
           <span

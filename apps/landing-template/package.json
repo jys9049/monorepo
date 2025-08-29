@@ -9,12 +9,12 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@driven/ui": "workspace:*",
     "next": "15.5.0",
     "react": "19.1.0",
     "react-dom": "19.1.0"
   },
   "devDependencies": {
+    "@driven/ui": "workspace:*",
     "@eslint/eslintrc": "^3",
     "@types/node": "^20",
     "@types/react": "^19",

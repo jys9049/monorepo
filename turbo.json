@@ -18,6 +18,9 @@
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "cache": false,
       "persistent": true
+    },
+    "pipeline": {
+      "outputs": ["dist/**"]
     }
   }
 }

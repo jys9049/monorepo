@@ -3,18 +3,52 @@ options:
   substitution_option: ALLOW_LOOSE
 
 steps:
+  # 1) detect which subfolders under `apps/` changed vs origin/main and write to workspace
   - name: "gcr.io/cloud-builders/git"
     entrypoint: /bin/bash
     args:
       - -c
       - |
+        set -euo pipefail
         git fetch --depth=50 origin main
-        CHANGED_APPS=$(git diff --name-only origin/main...HEAD | grep '^apps/' | cut -d/ -f2 | sort -u)
-        echo "Changed apps: $$CHANGED_APPS"
+        # list top-level folder names under apps/ that changed
+        git diff --name-only origin/main...HEAD | grep '^apps/' | cut -d/ -f2 | sort -u > /workspace/changed_apps.txt || true
+        echo "Changed apps: $(cat /workspace/changed_apps.txt | tr '\n' ' ')"
+
+  # 2) For each changed app build & deploy. Uses Dockerfile if present, otherwise uses Buildpacks.
+  - name: "gcr.io/cloud-builders/gcloud"
+    entrypoint: /bin/bash
+    args:
+      - -c
+      - |
+        set -euo pipefail
+        CHANGED_APPS=$(cat /workspace/changed_apps.txt | tr '\n' ' ')
+        if [ -z "$$CHANGED_APPS" ]; then
+          echo "No changed apps detected. Nothing to build/deploy."
+          exit 0
+        fi
+
+        for app in $$CHANGED_APPS; do
+          # skip empty lines
+          [ -z "$$app" ] && continue
+          echo "--- Processing app: $$app ---"
+
+          APP_DIR="apps/$$app"
+          IMAGE="gcr.io/$PROJECT_ID/$$app"
+
+          if [ -f "$$APP_DIR/Dockerfile" ]; then
+            echo "Found Dockerfile for $$app — building image via gcloud builds submit"
+            gcloud builds submit "$$APP_DIR" --tag "$$IMAGE"
+          else
+            echo "No Dockerfile for $$app — trying buildpacks (gcloud builds submit --pack)"
+            gcloud builds submit --pack "$$APP_DIR" --tag "$$IMAGE"
+          fi
+
+          echo "Deploying $$app to Cloud Run (region=${_REGION})"
+          gcloud run deploy "$$app" --image "$$IMAGE" --region "${_REGION}" --platform managed --quiet
+        done
 
 substitutions:
-  _AR_HOSTNAME: "asia-docker.pkg.dev" # ex) asia-docker.pkg.dev
-  _AR_PROJECT_ID: "my-gcp-project"
-  _AR_REPOSITORY: "my-repo"
-  _CLOUD_RUN_REGION: "asia-northeast3"
+  _REGION: "asia-northeast3"
+
 timeout: "1800s"

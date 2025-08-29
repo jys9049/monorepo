@@ -29,8 +29,10 @@ steps:
           gsutil -m rsync -r apps/$APP/out gs://${_GCS_BUCKET}/$APP/
           gcloud compute url-maps invalidate-cdn-cache ${_CDN_URLMAP} --path "/$APP/*"
         done
+options:
+  logging: CLOUD_LOGGING_ONLY
 
-# substitutions는 루트 레벨
+# 매개변수
 substitutions:
   _GCS_BUCKET: "landing-jys"
   _CDN_URLMAP: "landing-jys"

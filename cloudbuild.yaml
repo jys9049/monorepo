@@ -1,21 +1,64 @@
+# cloudbuild.yaml
 steps:
-  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk:latest"
-    entrypoint: "sh"
+  # 1. Node.js, PNPM 설치
+  - name: node:20-alpine
+    id: "Setup Node & PNPM"
+    entrypoint: sh
     args:
-      - "-c"
+      - -c
       - |
         npm install -g pnpm
-        pnpm install --filter=apps/${_REPO_NAME}...
-        pnpm --filter=apps/${_REPO_NAME} run build
-        pnpm --filter=apps/${_REPO_NAME} next export
-        gsutil -m rsync -r apps/${_REPO_NAME}/out gs://${_GCS_BUCKET}/${_REPO_NAME}/
-        gcloud compute url-maps invalidate-cdn-cache ${_CDN_URLMAP} --path "/${_REPO_NAME}/*"
+        pnpm install --frozen-lockfile
 
-options:
-  logging: CLOUD_LOGGING_ONLY
+  # 2. 변경된 앱 확인 (Turborepo 사용)
+  - name: node:20-alpine
+    id: "Detect changed apps"
+    entrypoint: sh
+    args:
+      - -c
+      - |
+        CHANGED_APPS=$(npx turbo list --filter="apps/*" --since origin/main --json | jq -r '.[] | .name')
+        if [ -z "$$CHANGED_APPS" ]; then
+          echo "No changed apps. Skipping build."
+          exit 0
+        fi
+        echo "Changed apps: $$CHANGED_APPS"
+        echo "$$CHANGED_APPS" > changed_apps.txt
+
+  # 3. 각 앱 Docker 이미지 빌드 & 푸시
+  - name: gcr.io/cloud-builders/docker
+    id: "Build and Push Docker"
+    entrypoint: sh
+    args:
+      - -c
+      - |
+        for APP in $(cat changed_apps.txt); do
+          echo "Building $$APP..."
+          docker build \
+            --tag $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$$APP:$COMMIT_SHA \
+            --file apps/$$APP/Dockerfile \
+            apps/$$APP
+          docker push $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$$APP:$COMMIT_SHA
+        done
+
+  # 4. (선택) Cloud Run 배포
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
+    id: "Deploy to Cloud Run"
+    entrypoint: sh
+    args:
+      - -c
+      - |
+        for APP in $(cat changed_apps.txt); do
+          gcloud run deploy $$APP \
+            --image $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$$APP:$COMMIT_SHA \
+            --region $_CLOUD_RUN_REGION \
+            --platform managed \
+            --allow-unauthenticated
+        done
 
 substitutions:
-  _GCS_BUCKET: "landing-jys"
-  _CDN_URLMAP: "landing-jys"
-  _REPO_NAME: "" # 트리거에서 이 변수로 앱 이름 넘겨줌
-timeout: 1800s
+  _AR_HOSTNAME: "asia-docker.pkg.dev" # ex) asia-docker.pkg.dev
+  _AR_PROJECT_ID: "my-gcp-project"
+  _AR_REPOSITORY: "my-repo"
+  _CLOUD_RUN_REGION: "asia-northeast3"
+timeout: "1800s"

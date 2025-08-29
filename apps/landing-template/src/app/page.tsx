@@ -79,7 +79,7 @@ export default function Home() {
             className={styles.close}
             onClick={() => console.log("modalClose(event)")}
           >
-            X
+            X테스트22
           </span>
           <br />
           <h3>개인정보취급방침</h3>

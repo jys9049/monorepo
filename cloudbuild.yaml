@@ -21,6 +21,8 @@ steps:
           exit 0
         fi
 
+        echo "CHANGED_APPS: $CHANGED_APPS"
+
         for APP in $CHANGED_APPS; do
           echo "Building $APP..."
           pnpm install --filter=$APP...

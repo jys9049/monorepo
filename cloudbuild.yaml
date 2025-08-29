@@ -14,7 +14,7 @@ steps:
     args:
       - "-c"
       - |
-        apk add --no-cache git
+        apk add --no-cache git bash
 
         CHANGED_APPS=$(git fetch origin main && git diff --name-only origin/main...HEAD | grep '^apps/landing-' | cut -d/ -f2 | sort -u)
 

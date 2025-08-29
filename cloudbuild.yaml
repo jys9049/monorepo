@@ -10,7 +10,7 @@ steps:
       - |
         git fetch --depth=50 origin main
         CHANGED_APPS=$(git diff --name-only origin/main...HEAD | grep '^apps/' | cut -d/ -f2 | sort -u)
-        echo "Changed apps: $CHANGED_APPS"
+        echo "Changed apps: $$CHANGED_APPS"
 
 substitutions:
   _AR_HOSTNAME: "asia-docker.pkg.dev" # ex) asia-docker.pkg.dev

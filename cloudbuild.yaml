@@ -40,6 +40,8 @@ steps:
           gcloud compute url-maps invalidate-cdn-cache ${_CDN_URLMAP} \
             --path "/$APP/*"
         done
+options:
+  logging: CLOUD_LOGGING_ONLY
 
 # 매개변수
 substitutions:

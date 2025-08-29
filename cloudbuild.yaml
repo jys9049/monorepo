@@ -7,6 +7,7 @@ steps:
     args:
       - "-c"
       - |
+        apk add --no-cache git
         npm install -g pnpm
         pnpm install --frozen-lockfile
 

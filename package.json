@@ -1,0 +1,20 @@
+{
+  "name": "monorepo",
+  "version": "1.0.0",
+  "packageManager": "pnpm@9.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "test": "turbo run test"
+  },
+  "dependencies": {
+    "@next/third-parties": "^15.5.2",
+    "dayjs": "^1.11.15",
+    "turbo": "^2.5.6"
+  }
+}

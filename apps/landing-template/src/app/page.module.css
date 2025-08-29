@@ -1,0 +1,240 @@
+.container {
+  position: relative;
+  width: 900px;
+  margin: 0 auto;
+  background-color: #fff;
+}
+
+.container > img {
+  width: 100%;
+  display: block;
+  height: auto;
+}
+
+/* Form Section */
+.form_section {
+  position: fixed;
+  bottom: -1px;
+  left: 50%;
+  max-width: 900px;
+  transform: translateX(-50%);
+  width: 100%;
+  z-index: 1000;
+  overflow: hidden;
+  text-align: center;
+  display: flex;
+  gap: 20px;
+  padding: 15px 30px;
+  align-items: center;
+  background-color: #ffe3f9;
+  box-shadow: 0 -3px 10px 3px rgba(0, 0, 0, 0.3);
+  box-sizing: border-box;
+}
+
+.submitBtn {
+  width: 47%;
+}
+
+.inputForm-wrapper {
+  display: flex;
+  gap: 10px;
+}
+
+.inputForm-wrapper > div {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.inputForm-wrapper > div > label {
+  font-size: 20px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.inputForm-wrapper > div > input {
+  width: 100%;
+  height: 40px;
+  border: none;
+  border-radius: 5px;
+  padding: 0 10px;
+}
+
+.inputForm-wrapper > div > input#counsel_name {
+  width: 75px;
+}
+
+/* Privacy Box */
+.privacy_box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  justify-content: center;
+}
+
+.privacy_box label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.privacy_box input[type="checkbox"] {
+  display: none;
+}
+
+.privacy_box input[type="checkbox"] + span {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 26px;
+  background-color: #ccc;
+  border-radius: 13px;
+  transition: all 0.3s;
+}
+
+.privacy_box input[type="checkbox"] + span:before {
+  content: "";
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background-color: white;
+  top: 2px;
+  left: 2px;
+  transition: all 0.3s;
+}
+
+.privacy_box input[type="checkbox"]:checked + span {
+  background-color: #fe50ca;
+}
+
+.privacy_box input[type="checkbox"]:checked + span:before {
+  transform: translateX(24px);
+}
+
+.agreeText {
+  font-size: 17px;
+}
+
+#agreeView {
+  color: #4335ff;
+  text-decoration: underline;
+}
+
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+}
+
+.modal-content {
+  position: relative;
+  background-color: #fff;
+  margin: 5% auto;
+  padding: 30px;
+  width: 80%;
+  max-width: 600px;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-content h3 {
+  color: #333;
+  font-size: 24px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.modal-content p {
+  color: #666;
+  font-size: 16px;
+  line-height: 1.6;
+  margin: 10px 0;
+}
+
+.close {
+  position: absolute;
+  right: 20px;
+  top: 15px;
+  color: #666;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.close:hover {
+  color: #ff2e63;
+}
+
+/* Media Queries */
+@media screen and (max-width: 768px) {
+  html {
+    background-color: #fff;
+  }
+
+  body {
+    padding-bottom: 146px;
+  }
+
+  .container {
+    width: 100%;
+  }
+
+  .form_section {
+    flex-direction: column;
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .form_section #submitBtn {
+    width: 100%;
+  }
+
+  .inputForm-wrapper > div > label {
+    font-size: 15px;
+  }
+
+  .agreeText,
+  #agreeView {
+    font-size: 13px;
+  }
+
+  .privacy_box input[type="checkbox"] + span {
+    width: 40px;
+    height: 20px;
+    border-radius: 10px;
+  }
+
+  .privacy_box input[type="checkbox"] + span:before {
+    width: 16px;
+    height: 16px;
+    top: 2px;
+    left: 2px;
+  }
+
+  .privacy_box input[type="checkbox"]:checked + span:before {
+    transform: translateX(20px);
+  }
+}

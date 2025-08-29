@@ -10,9 +10,27 @@ steps:
       - -c
       - |
         set -euo pipefail
-        git fetch --depth=50 origin main
-        # list top-level folder names under apps/ that changed
-        git diff --name-only origin/main...HEAD | grep '^apps/' | cut -d/ -f2 | sort -u > /workspace/changed_apps.txt || true
+        # fetch remote main so we can compare against it
+        git fetch --depth=50 origin main || true
+
+        # Try to detect changed files against origin/main first. This works for PRs
+        # and branch builds. If that produces no output (for example when a build
+        # runs on main and origin/main already points to the new commit), fall
+        # back to comparing the last commit (HEAD^...HEAD).
+        CHANGED_FILES=$(git diff --name-only origin/main...HEAD || true)
+
+        if [ -z "$$CHANGED_FILES" ]; then
+          # If there's a parent commit, compare last commit vs its parent.
+          if git rev-parse --verify HEAD^ >/dev/null 2>&1; then
+            CHANGED_FILES=$(git diff --name-only HEAD^...HEAD || true)
+          else
+            # No parent (initial commit) — treat all tracked files as changed
+            CHANGED_FILES=$(git ls-files || true)
+          fi
+        fi
+
+        # From the changed files list, extract top-level app folders under apps/
+        echo "$$CHANGED_FILES" | grep '^apps/' | cut -d/ -f2 | sort -u > /workspace/changed_apps.txt || true
         echo "Changed apps: $(cat /workspace/changed_apps.txt | tr '\n' ' ')"
 
   # 2) For each changed app build & deploy. Uses Dockerfile if present, otherwise uses Buildpacks.
